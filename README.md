@@ -18,3 +18,13 @@ This solution has two projects: ScEncryptor and SharpInjector. The ScEncryptor p
 5. Set the decryption key in SharpInjector\Program.cs
 6. Set the `exeMethod`, `ParentName`, and `ProgramPath` variables in SharpInjector\Program.cs to desired values
 7. Build the SharpInjector project (set to x64 before building)
+
+## Execution Methods
+Current options for shellcode execution include the following Windows API calls:
+* CreateFiber
+* CreateRemoteThread
+* CreateRemoteThreadEx
+* CreateThread
+* EtwpCreateEtwThread
+* QueueUserAPC
+* RtlCreateUserThread

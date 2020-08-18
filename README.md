@@ -11,9 +11,9 @@
 This solution has two projects: ScEncryptor and SharpInjector. The ScEncryptor project will allow you to encrypt a `.bin` file containing your shellcode. The SharpInjector project will be compiled with the resulting encrypted shellcode and inject it into memory. The shellcode the project comes with simply opens calc.
 
 ## Usage
-1. Set the encryption key in EncryptShellcode\Program.cs (the key must be 16/24/32 bytes)
-2. Build the EncryptShellcode project
-3. Use the resulting executable to encrypt your shellcode: `EncryptShellcode.exe C:\Temp\shellcode.bin` (The encrypted shellcode will be automatically inserted in SharpInjector\Shellycode.cs)
+1. Set the encryption key in ScEncryptor\Program.cs (the key must be 16/24/32 bytes)
+2. Build the ScEncryptor project
+3. Use the resulting executable to encrypt your shellcode: `ScEncryptor.exe C:\Temp\shellcode.bin` (The encrypted shellcode will be automatically inserted in SharpInjector\Shellycode.cs)
 4. Optional: set `EncSc = ""` within SharpInjector\Shellycode.cs and instead host the shellcode string on the web. Set the `ShellcodeUrl` variable in SharpInjector\Program.cs to the URL of the `EncSc` string
 5. Set the decryption key in SharpInjector\Program.cs
 6. Set the `exeMethod`, `ParentName`, and `ProgramPath` variables in SharpInjector\Program.cs to desired values

@@ -73,7 +73,7 @@ namespace ScEncryptor
             string ProjectDir = Directory.GetParent(WorkingDir).Parent.FullName;
 
             string[] lines = {
-                "namespace Injector",
+                "namespace SharpInjector",
                 "{",
                 "\tclass EncryptedShellcode",
                 "\t{",
@@ -82,7 +82,7 @@ namespace ScEncryptor
                 "}"
             };
 
-            File.WriteAllLines($"{ProjectDir}\\..\\Injector\\Shellycode.cs", lines);
+            File.WriteAllLines($"{ProjectDir}\\..\\SharpInjector\\Shellycode.cs", lines);
 
         }
 

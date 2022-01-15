@@ -95,15 +95,6 @@ namespace SharpInjector
             IntPtr hObject
         );
 
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr ConvertThreadToFiber(
-            IntPtr lpParameter);
-
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr CreateFiber(
-            uint dwStackSize,
-            IntPtr lpStartAddress,
-            IntPtr lpParameter);
 
         [DllImport("kernel32.dll")]
         public static extern bool CreateProcess(
@@ -118,17 +109,8 @@ namespace SharpInjector
             ref STARTUPINFOEX lpStartupInfo,
             out PROCESS_INFORMATION lpProcessInformation);
 
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr CreateThread(
-            IntPtr lpThreadSecurityAttributes,
-            uint dwStackSize,
-            IntPtr lpStartAddress,
-            IntPtr param,
-            UInt32 dwCreationFlags,
-            ref UInt32 lpThreadId);
-
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr CreateRemoteThread(
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate IntPtr CreateRemoteThread(
             IntPtr hProcess,
             IntPtr lpThreadAttributes,
             uint dwStackSize,
@@ -136,22 +118,6 @@ namespace SharpInjector
             IntPtr lpParameter,
             uint dwCreationFlags,
             IntPtr lpThreadId);
-
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr CreateRemoteThreadEx(
-            IntPtr hProcess,
-            IntPtr lpThreadAttributes,
-            uint dwStackSize,
-            IntPtr lpStartAddress,
-            IntPtr lpParameter,
-            uint dwCreationFlags,
-            IntPtr lpAttributeList,
-            IntPtr lpThreadId);
-
-        [DllImport("ntdll.dll")]
-        public static extern IntPtr EtwpCreateEtwThread(
-            IntPtr lpStartAddress,
-            IntPtr lpParameter);
 
         [DllImport("kernel32.dll")]
         public static extern bool InitializeProcThreadAttributeList(
@@ -166,31 +132,25 @@ namespace SharpInjector
             bool bInheritHandle,
             int dwProcessId);
 
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr OpenThread(
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate IntPtr OpenThread(
             ThreadAccess dwDesiredAccess,
             bool bInheritHandle,
             int dwThreadId);
 
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr QueueUserAPC(
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate IntPtr QueueUserAPC(
             IntPtr pfnAPC,
             IntPtr hThread,
             IntPtr dwData
             );
 
-        [DllImport("kernel32.dll")]
-        public static extern uint ResumeThread(
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate uint ResumeThread(
             IntPtr hThread);
 
-        [DllImport("kernel32.dll", EntryPoint = "RtlMoveMemory")]
-        public static extern void RtlCopyMemory(
-            IntPtr Destination,
-            IntPtr Source,
-            Int32 length);
-
-        [DllImport("ntdll.dll")]
-        public static extern long RtlCreateUserThread(
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate long RtlCreateUserThread(
             IntPtr hProcess,
             UInt32 SecurityDescriptor,
             bool CreateSuspended,
@@ -202,10 +162,6 @@ namespace SharpInjector
             IntPtr Destination,
             out IntPtr hThread,
             out UInt32 ClientID);
-
-        [DllImport("kernel32.dll")]
-        public static extern void SwitchToFiber(
-            IntPtr lpFiber);
 
         [DllImport("kernel32.dll")]
         public static extern bool TerminateProcess(
@@ -222,26 +178,13 @@ namespace SharpInjector
             IntPtr lpPreviousValue,
             IntPtr lpReturnSize);
 
-        [DllImport("kernel32.dll")]
-        public static extern IntPtr VirtualAlloc(
-            IntPtr lpAddress,
-            Int32 dwSize,
-            UInt32 flAllocationType,
-            UInt32 flProtect);
-
-       [DllImport("kernel32.dll")]
-        public static extern IntPtr VirtualAllocEx(
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate IntPtr VirtualAllocEx(
             IntPtr hProcess,
             IntPtr lpAddress,
             Int32 dwSize,
             UInt32 flAllocationType,
             UInt32 flProtect);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool VirtualFree(
-            IntPtr lpAddress,
-            UInt32 dwSize,
-            FreeType dwFreeType);
 
         [DllImport("kernel32.dll")]
         public static extern bool VirtualFreeEx(
@@ -250,28 +193,16 @@ namespace SharpInjector
             int dwSize,
             FreeType dwFreeType);
 
-        [DllImport("kernel32.dll")]
-        public static extern bool VirtualProtect(
-            IntPtr lpAddress,
-            int dwSize,
-            uint flNewProtect,
-            out uint lpflOldProtect);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool VirtualProtectEx(
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate bool VirtualProtectEx(
             IntPtr handle,
             IntPtr lpAddress,
             int dwSize,
             uint flNewProtect,
             out uint lpflOldProtect);
 
-        [DllImport("kernel32.dll")]
-        public static extern UInt32 WaitForSingleObject(
-            IntPtr hHandle,
-            uint dwMilliseconds);
-
-        [DllImport("kernel32.dll")]
-        public static extern bool WriteProcessMemory(
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        public delegate bool WriteProcessMemory(
         IntPtr hProcess,
         IntPtr lpBaseAddress,
         byte[] lpBuffer,

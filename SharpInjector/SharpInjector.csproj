@@ -66,12 +66,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="reprobate.cs" />
+    <Compile Include="h_reprobate.cs" />
     <Compile Include="RtlCreateUserThread.cs" />
-    <Compile Include="EtwpCreateEtwThread.cs" />
     <Compile Include="CreateRemoteThread.cs" />
-    <Compile Include="CreateFiber.cs" />
-    <Compile Include="CreateThread.cs" />
-    <Compile Include="CreateRemoteThreadEx.cs" />
     <Compile Include="QueueUserAPC.cs" />
     <Compile Include="WinAPI.cs" />
     <Compile Include="Program.cs" />

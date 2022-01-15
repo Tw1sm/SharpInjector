@@ -1,4 +1,5 @@
 # SharpInjector
+Project now has a 2nd branch, DInvoke, that implements Reprobate for D/Invoke functionality - 1/15/2022
 
 ## Objectives
 * Utilize encrypted shellcode

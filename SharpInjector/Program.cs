@@ -80,7 +80,7 @@ namespace SharpInjector
         // Decryptor func
         public static string Dec(string ciphertext)
         {
-            string key = "Thisismytestkey1"; // CHANGE THIS 16/24/32 BYTE VALUE TO MATCH ENCRYPTION KEY
+            string key = "01010101010101010101010101010101"; // CHANGE THIS 16/24/32 BYTE VALUE TO MATCH ENCRYPTION KEY
 
             byte[] iv = new byte[16];
             byte[] buffer = Convert.FromBase64String(ciphertext);
